@@ -7,37 +7,27 @@ import java.util.Scanner;
 
 public class Main {
 	
-	static String ruta = "C:\\Users\\Nerea\\Desktop\\Clubes";
 	static Scanner entrada = new Scanner(System.in);
+	/*
+	 * Creamos un objeto de tipo File con la ruta de la carpeta donde
+	 * se almacenan todos los clubes.
+	 */
+	static String ruta = "C:\\Users\\Nerea\\Desktop\\Clubes";
+	static File folder = new File(ruta);
 	static SimpleLinkedListClub clubes = new SimpleLinkedListClub();
-	// Hay que hacer un objeto de tipo file y hay que almacenarlo todo en las listas enlazadas
 	
+	/**
+	 * Pre: ---
+	 * Post: 
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		// Algunas pruebitas
-		System.out.println("Fundacion de un club sin socios:");
-		String nombreClub = "Club 1";
-		Club nuevoClub = new Club(nombreClub);
-		
-		// Incorporacion de un socio en un club
-		Socio nuevoSocio1 = new Socio("Pepe", "Garcia", "Garcia", "10-05-2022");
-		NodeSocio n1 = new NodeSocio (nuevoSocio1, null);
-		Socio nuevoSocio2 = new Socio("Alejandro", "Garcia", "Garcia", "10-05-2022");
-		NodeSocio n2 = new NodeSocio (nuevoSocio2, null);
-		nuevoClub.getSocios().add(n1);
-		
-		nuevoClub.getSocios().show();
-		
-		// Borrado de un socio en un club
-		nuevoClub.getSocios().delete(0);
-		
-		nuevoClub.getSocios().show();
-		
-		/*
-		 * Creamos un objeto de tipo File con la ruta de la carpeta donde
-		 * se almacenan todos los clubes.
-		 */
-		File folder = new File(ruta);
 		findAllFilesInFolder(folder);
+		System.out.println("-------------");
+		System.out.println("Imprimimos los nombres de los clubs cargados de los documentos");
+		for (int i = 0; i < clubes.getSize(); i++) {
+			System.out.println(clubes.get(i).getContent().getNombre());
+		}
 		
 		System.out.println("¡Bienvenidos al gestor de Clubes de Socios!");
 		// Con este bucle permitimos al usuario elegir lo que quiere hacer
@@ -77,6 +67,7 @@ public class Main {
 	 * @param folder
 	 */
 	public static void findAllFilesInFolder(File folder) {
+		System.out.println("Tenemos los siguientes documentos:");
 		int posicionClub = 0;
 		for (File file : folder.listFiles()) {
 			if (!file.isDirectory()) {
@@ -101,12 +92,12 @@ public class Main {
 			int contador = 0;
 			// Mientras el fichero tenga lineas
 			while (f.hasNextLine()) {
+				String linea = f.nextLine();
 				// Si estamos en la cabecera del .csv cogemos el nombre del club
 				if (contador == 0) {
-					String nombreClub = f.nextLine();
 					// Añadimos la lista de socios vacia 
 					SimpleLinkedListSocio socios = new SimpleLinkedListSocio();
-					Club club = new Club (nombreClub, socios);
+					Club club = new Club (linea, socios);
 					NodeClub node = new NodeClub(club, null);
 					clubes.add(node);
 				}
@@ -116,15 +107,15 @@ public class Main {
 				 * a la lista simple enlazada de su club correspondiente.
 				 */
 				else {
-					String linea = f.nextLine();
 					// Separamos la linea por el separador del csv
-					String[] datosSocio = linea.split(";");
+					String[] datosSocio = linea.split(" ");
 					String nombre = datosSocio[0];
 					String apellido1 = datosSocio[1];
 					String apellido2 = datosSocio[2];
 					String fechaIncorporacion = datosSocio[3];
 					Socio socio = new Socio (nombre, apellido1, apellido2, fechaIncorporacion);
 					NodeSocio nodeSocio = new NodeSocio(socio, null);
+					// Hay que reprogramar el add para que sea alfabeticamente!! 
 					clubes.get(posicionClub).getContent().getSocios().add(nodeSocio);
 				}
 				contador++;
@@ -141,7 +132,7 @@ public class Main {
 		System.out.println("Elegir un club existente [1]");
 		System.out.println("Añadir un nuevo club (sin socios) [2]");
 		System.out.println("Unir dos clubes [3]");
-		System.out.println("Apagar [3]");
+		System.out.println("Apagar [4]");
 	}
 	
 	public static void mostrarSubMenu() {
@@ -189,7 +180,9 @@ public class Main {
 
 
 	private static void clubIsEmpty() {
-		// TODO Auto-generated method stub
+		if (clubes.getSize() == 0) {
+			
+		}
 		
 	}
 
