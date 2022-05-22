@@ -4,10 +4,7 @@ public class Club {
 	private String nombre;
 	private SimpleLinkedListSocio socios = new SimpleLinkedListSocio();
 
-	/**
-	 * @param nombre
-	 * @param socios
-	 */
+	// METODOS CONSTRUCTORES
 	public Club(String nombre, SimpleLinkedListSocio socios) {
 		super();
 		this.nombre = nombre;
@@ -18,7 +15,8 @@ public class Club {
 	public Club (String nombre) {
 		this.nombre = nombre;
 	}
-
+	
+	// METODOS GET Y SET
 	public String getNombre() {
 		return nombre;
 	}

@@ -5,17 +5,13 @@ public class NodeClub {
 	private NodeClub next;
 
 
-	/**
-	 * @param content
-	 * @param next
-	 * @param previous
-	 */
+	// METODO CONSTRUCTOR
 	public NodeClub(Club content, NodeClub next) {
 		this.content = content;
 		this.setNext(next);
 	}
 
-	
+	// METODOS GET Y SET
 	public Club getContent() {
 		return content;
 	}

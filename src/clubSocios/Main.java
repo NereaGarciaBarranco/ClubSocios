@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
 
 public class Main {
 	// Creacion de los objetos necesarios accesibles desde toda la clase
@@ -18,18 +20,15 @@ public class Main {
 	static String ruta = "C:/Users/Nerea/Desktop/Clubes";
 	static File folder = new File(ruta);
 	static SimpleLinkedListClub clubes = new SimpleLinkedListClub();
-	static int clubEscogido = 0;
+	static int clubEscogido = -1;
 	
 	/**
 	 * Pre: ---
 	 * Post: Este metodo principal se encarga de ejecutar el menu del gestor de
 	 * los clubs de socios y de llamar a los metodos correspondientes para cada
 	 * una de las funcionalidades del programa. 
-	 * @param args
-	 * @throws FileNotFoundException 
-	 * @throws UnsupportedEncodingException 
 	 */
-	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+	public static void main(String[] args) {
 		// Cargamos todos los datos de los archivos de la carpeta
 		findAllFilesInFolder(folder);
 		System.out.println("¡Bienvenidos al gestor de Clubes de Socios!");
@@ -41,8 +40,9 @@ public class Main {
 				int respuesta = entrada.nextInt();
 				if (respuesta == 1) {
 					mostrarClubes();
-					mostrarSubMenu();
-					elegirOpcionSubMenu();
+					if (clubEscogido != -1) {
+						elegirOpcionSubMenu();						
+					}
 				} else if (respuesta == 2) {
 					agregarClub();
 				} else if (respuesta == 3) {
@@ -130,7 +130,7 @@ public class Main {
 	 * Post Este metodo muestra por pantalla el menu del programa.
 	 */
 	public static void mostrarMenu() {
-		System.out.println("¿Que deseas hacer?");
+		System.out.println("\n¿Que deseas hacer?");
 		System.out.println("Elegir un club existente [1]");
 		System.out.println("Añadir un nuevo club (sin socios) [2]");
 		System.out.println("Unir dos clubes [3]");
@@ -142,18 +142,27 @@ public class Main {
 	 * Post: Muestra los clubes existentes al usuario para que pueda elegir 
 	 * uno de ellos mediante un numero y comprueba que ese numero exista.
 	 */
-	public static void mostrarClubes() {
-		System.out.println("Elige un club:");
-		for (int i = 0; i < clubes.getSize(); i++) {
-			System.out.println("[" + i + "] " + clubes.get(i).toString());
-		}
-		while (true) {
-			clubEscogido = entrada.nextInt();
-			if (clubEscogido <= clubes.getSize()) {
-				break;
-			} else {
-				System.out.println("Introduce un numero de club existente");
+	public static int mostrarClubes() {
+		// Comprobamos si hay clubes
+		if (clubes.getSize() > 0) {
+			System.out.println("Elige un club:");
+			for (int i = 0; i < clubes.getSize(); i++) {
+				System.out.println("[" + i + "] " + clubes.get(i).toString());
 			}
+			while (true) {
+				clubEscogido = entrada.nextInt();
+				// Si introduce un codigo de club correcto
+				if (clubEscogido <= clubes.getSize() && clubEscogido >= 0) {
+					return clubEscogido;
+				} else {
+					System.out.println("Introduce un numero de club existente");
+				}
+			}			
+		} 
+		// Si no los hay mostramos un mensaje de advertencia y se vuelve al menu
+		else {
+			System.out.println("No hay ningun club registrado.");
+			return -1;
 		}
 	}
 	
@@ -163,8 +172,9 @@ public class Main {
 	 * solo su nombre y se añade a la lista simple de clubes. Tambien se
 	 * crea un archivo .csv con el mismo nombre que el club.
 	 * @throws FileNotFoundException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	public static void agregarClub() throws FileNotFoundException {
+	public static void agregarClub() {
 		entrada.nextLine();
 		System.out.println("Introduce el nombre del nuevo club:");
 		String nombreClub = entrada.nextLine();
@@ -176,10 +186,15 @@ public class Main {
 		// Le añadimos la extension del archivo al nombre y lo creamos 
 		nombreClub = nombreClub + ".csv";
 		File f = new File(ruta, nombreClub);
-		PrintWriter pw = new PrintWriter (f);
+		try {
+			PrintWriter pw = new PrintWriter (f);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		// Avisamos de que se ha creado
 		System.out.println("El club ha sido creado correctamente.");
-		System.out.println("Si desea agregarle socios seleccionelo desde el menu.");	
+		System.out.println("Si desea agregarle socios seleccionelo desde el menu.");
+		actualizarFicherosClubes();
 	}
 	
 	/**
@@ -189,19 +204,17 @@ public class Main {
 	 * en ambos casos. 
 	 */
 	private static void unirDosClubes() {
-		Scanner entrada = new Scanner(System.in);
+		entrada.nextLine();
 		System.out.println("Elige el primer Club que quieres fusionar:");
-		mostrarClubes();
-		int idClubUno = entrada.nextInt();
+		int idClubUno = mostrarClubes();
 		System.out.println("Elige el segundo Club que quieres fusionar:");
-		mostrarClubes();
-		int idClubDos = entrada.nextInt();
+		int idClubDos = mostrarClubes();
 		Club clubDos = clubes.get(idClubDos).getContent();
 		/*
 		 * Comprobamos que el segundo club tenga socios porque sino lo unico que haremos
 		 * sera eliminar el segundo club.
 		 */
-		if (!isClubEmpty(idClubDos)) {
+		if (!isClubEmpty(idClubDos, false)) {
 			// Con un bucle recorremos los socios del club dos y los copiamos al uno
 			for (int i = 0; i < clubDos.getSocios().getSize(); i++) {
 				// Hacemos un Node con cada uno de los socios del club 2
@@ -212,7 +225,8 @@ public class Main {
 		}
 		// En ambos casos se borra el club dos
 		clubes.delete(idClubDos);
-		entrada.close();
+		System.out.println("Los socios del club 2 se han sumado al club 1 correctamente.");
+		actualizarFicherosClubes();
 	}
 	
 	/**
@@ -221,14 +235,14 @@ public class Main {
 	 * usuario pueda escoger la opcion que necesite.
 	 */
 	public static void mostrarSubMenu() {
-		System.out.println("¿Que deseas hacer con este club?");
+		System.out.println("\n¿Que deseas hacer con este club?");
 		System.out.println("Comprobar si tiene socios [1]");
 		System.out.println("Ver numero de socios del club [2]");
 		System.out.println("Dar de alta un socio [3]");
 		System.out.println("Dar de baja un socio [4]");
 		System.out.println("Ver socios de este club [5]");
 		System.out.println("Comprobar pertenencia de un socio [6]");
-		System.out.println("Guardar en un fichero este club [7]");	
+		System.out.println("Volver atras [7]");	
 	}
 	
 	/**
@@ -236,36 +250,39 @@ public class Main {
 	 * Post: Este metodo permite al usuario escoger la opcion del submenu
 	 * que le permita hacer la accion que quiera con el club escogido. 
 	 * Cada opcion llama al metodo necesario para realizar la accion.
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException
 	 */
-	private static void elegirOpcionSubMenu() throws FileNotFoundException, UnsupportedEncodingException {
+	private static void elegirOpcionSubMenu() {
+		boolean salir = false;
 		while (true) {
+			mostrarSubMenu();
 			int opcionEscogida = entrada.nextInt();
-			if (opcionEscogida == 1) {
-				isClubEmpty(clubEscogido);
-				break;
-			} else if (opcionEscogida == 2) {
-				verNumeroSocios(clubEscogido);
-				break;
-			} else if (opcionEscogida == 3) {
-				altaSocio(clubEscogido);
-				break;
-			} else if (opcionEscogida == 4) {
-				bajaSocio(clubEscogido);
-				break;
-			} else if (opcionEscogida == 5) {
-				verSocios(clubEscogido);
-				break;
-			} else if (opcionEscogida == 6) {
-				comprobarPertenenciaSocio(clubEscogido);
-				break;
-			} else if (opcionEscogida == 7) {				
-				actualizarFicherosClubes();
-				break;
+			switch(opcionEscogida) {
+				case 1:
+					isClubEmpty(clubEscogido, true);
+					break;
+				case 2:				
+					verNumeroSocios(clubEscogido);
+					break;
+				case 3:
+					altaSocio(clubEscogido);
+					break;
+				case 4: 
+					bajaSocio(clubEscogido);
+					break;
+				case 5:
+					verSocios(clubEscogido);
+					break;
+				case 6:
+					comprobarPertenenciaSocio(clubEscogido);
+					break;
+				case 7:
+					salir = true;
+					break;
+				default:
+					System.out.println("Introduce una opcion correcta.");	
 			}
-			else {
-				System.out.println("Introduce una opcion correcta.");
+			if (salir) {
+				break;
 			}
 		}
 	}
@@ -277,12 +294,16 @@ public class Main {
 	 * devuelve [true] o [false] para poder ser usado en condiciones.
 	 * @return 
 	 */
-	private static boolean isClubEmpty(int clubEscogido) {
+	private static boolean isClubEmpty(int clubEscogido, boolean mostrar) {
 		if (clubes.get(clubEscogido).getContent().getSocios().getSize() == 0) {
-			System.out.println("Este club de socios esta vacio.");
+			if(mostrar) {
+				System.out.println("Este club de socios esta vacio.");
+			}
 			return true;
 		} else {
-			System.out.println("Este club tiene socios.");
+			if(mostrar) {
+				System.out.println("Este club tiene socios.");
+			}
 			return false;
 		}		
 	}
@@ -304,20 +325,27 @@ public class Main {
 	 * Post: Muestra por pantalla los socios que pertenecen al club escogido.
 	 */
 	private static void verSocios(int clubEscogido) {
-		Club auxiliar = clubes.get(clubEscogido).getContent();
-		int size = clubes.get(clubEscogido).getContent().getSocios().getSize();
-		for (int i = 0; i < size; i++) {
-			auxiliar.getSocios().get(i).toString();
-		}	
+		if (!isClubEmpty(clubEscogido, false)) {
+			Club auxiliar = clubes.get(clubEscogido).getContent();
+			int size = clubes.get(clubEscogido).getContent().getSocios().getSize();
+			// Recorremos los socios del club escogido y los mostramos por pantalla
+			for (int i = 0; i < size; i++) {
+				System.out.println("[" + i + "] " + auxiliar.getSocios().get(i).getContent().toString()); 			
+			}				
+		} else {
+			System.out.println("Este club no tiene socios.");
+		}
 	}
 
 	/**
 	 * Pre: Recibe como parametro un entero que contiene la posicion del club
 	 * escogido en la lista simple enlazada.
 	 * Post: Da de alta a un socio en el club escogido.
+	 * @throws UnsupportedEncodingException 
+	 * @throws FileNotFoundException 
 	 */
 	private static void altaSocio(int clubEscogido) {
-		Scanner entrada = new Scanner(System.in);
+		entrada.nextLine();
 		System.out.println("Dime el nombre del nuevo socio:");
 		String nombre = entrada.nextLine();
 		System.out.println("Dime su primer apellido:");
@@ -331,7 +359,7 @@ public class Main {
 		clubes.get(clubEscogido).getContent().getSocios().add(nuevoNode);
 		System.out.println("El socio " + nuevoSocio.toString() 
 			+ "ha sido insertado correctamente.");	
-		entrada.close();
+		actualizarFicherosClubes();
 	}
 	
 	/**
@@ -339,14 +367,20 @@ public class Main {
 	 * escogido en la lista simple enlazada.
 	 * Post: Da de baja a un socio concreto (mediante la introduccion de un 
 	 * numero que lo identifica) del club escogido.
+	 * @throws UnsupportedEncodingException 
+	 * @throws FileNotFoundException 
 	 */
 	private static void bajaSocio(int clubEscogido) {
-		Scanner entrada = new Scanner(System.in);
-		verSocios(clubEscogido);
-		int socioEscogido = entrada.nextInt();
-		clubes.get(clubEscogido).getContent().getSocios().delete(socioEscogido);
-		System.out.println("Ha sido eliminado correctamente.");	
-		entrada.close();
+		if (!isClubEmpty(clubEscogido, false)) {
+			verSocios(clubEscogido);
+			System.out.println("Elige el socio que quieres dar de baja: ");
+			int socioEscogido = entrada.nextInt();
+			clubes.get(clubEscogido).getContent().getSocios().delete(socioEscogido);
+			System.out.println("Ha sido eliminado correctamente.");	
+			actualizarFicherosClubes();			
+		} else {
+			System.out.println("Este club no tiene socios.");
+		}
 	}
 	
 	/**
@@ -356,43 +390,57 @@ public class Main {
 	 * su nombre y apellidos.
 	 */
 	private static void comprobarPertenenciaSocio(int clubEscogido) {
-		Scanner entrada = new Scanner(System.in);
-		System.out.println("Dime el nombre del nuevo socio:");
-		String nombre = entrada.nextLine();
-		System.out.println("Dime su primer apellido:");
-		String apellido1 = entrada.nextLine();
-		System.out.println("Dime su segundo apellido");
-		String apellido2 = entrada.nextLine();
-		Club auxiliar = clubes.get(clubEscogido).getContent();
-		/*
-		 * Recorremos los socios del club escogido y vamos uno por uno comprobando
-		 * si existe uno con el mismo nombre y apellidos.
-		 */
-		for (int i = 0; i < auxiliar.getSocios().getSize(); i++) {
-			if (auxiliar.getSocios().get(i).getContent().getNombre() == nombre &&
-					auxiliar.getSocios().get(i).getContent().getApellido1() == apellido1 && 
-					auxiliar.getSocios().get(i).getContent().getApellido2() == apellido2) {
-				System.out.println("Este socio pertenece al club.");
-				entrada.close();
-				break;
-			} else {
-				System.out.println("Este persona no pertenece a este club.");
-				entrada.close();
-			}
-		}	
+		// Si el club elegido tiene socios realizamos la accion
+		if (!isClubEmpty(clubEscogido, false)) {
+			entrada.nextLine();
+			System.out.println("Dime el nombre del socio:");
+			String nombre = entrada.nextLine();
+			System.out.println("Dime su primer apellido:");
+			String apellido1 = entrada.nextLine();
+			System.out.println("Dime su segundo apellido");
+			String apellido2 = entrada.nextLine();
+			Club auxiliar = clubes.get(clubEscogido).getContent();
+			/*
+			 * Recorremos los socios del club escogido y vamos uno por uno comprobando
+			 * si existe uno con el mismo nombre y apellidos.
+			 */
+			for (int i = 0; i < auxiliar.getSocios().getSize(); i++) {
+				if (auxiliar.getSocios().get(i).getContent().getNombre().equals(nombre) &&
+						auxiliar.getSocios().get(i).getContent().getApellido1().equals(apellido1) && 
+						auxiliar.getSocios().get(i).getContent().getApellido2().equals(apellido2)) {
+					System.out.println("Este socio pertenece al club.");
+					return;
+				}
+			}	
+			System.out.println("Este persona no pertenece a este club.");		
+		} else {
+			System.out.println("Este club no tiene socios.");
+		}
 	}
 
 	/**
 	 * Pre: ---
 	 * Post: Este metodo se encarga de sobreescribir los ficheros que contienen
-	 * los datos de los clubes y los socios.
-	 * @throws UnsupportedEncodingException 
+	 * los datos de los clubes y los socios. Se llama cada vez que se añaden o
+	 * borran algunos datos para que siempre este todo actualizado con lo que 
+	 * sucede en el programa.
 	 */
-	private static void actualizarFicherosClubes() throws FileNotFoundException, UnsupportedEncodingException {
+	private static void actualizarFicherosClubes(){
+		File f;
 		Formatter escritura = new Formatter();
+		
+		// Borramos todos los archivos de la carpeta para poder sobreescribirlo
+		Arrays.stream(new File("C:/Users/Nerea/Desktop/Clubes/").listFiles()).forEach(File::delete);
+		
 		for (int i = 0; i < clubes.getSize(); i++) {
 			// Creamos el .csv con el nombre del club correspondiente
-			escritura = new Formatter(ruta, clubes.get(i).getContent().getNombre() + ".csv");
+			try {
+				String rutaConNombre = "C:\\Users\\Nerea\\Desktop\\Clubes\\" + clubes.get(i).getContent().getNombre() + ".csv";
+				f = new File (rutaConNombre);
+				escritura = new Formatter(f);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 			// Escribimos la cabecera
 			escritura.format(clubes.get(i).getContent().getNombre() + "\n");
 			// Si ese club tiene socios
@@ -406,8 +454,8 @@ public class Main {
 					escritura.format(clubes.get(i).getContent().getSocios().get(j).getContent().getFechaIncorporacion()+ "\n");
 				}	
 			}
+			escritura.flush();
 		}
-		escritura.flush();
 		escritura.close();
 	}
 	

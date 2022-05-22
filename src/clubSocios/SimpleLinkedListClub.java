@@ -4,6 +4,7 @@ public class SimpleLinkedListClub {
 	private NodeClub first;
 	private int size;
 	
+	// METODOS CONSTRUCTORES
 	// Cuando la lista esta vacia
 	public SimpleLinkedListClub() {
 		this.first = null;
@@ -33,7 +34,13 @@ public class SimpleLinkedListClub {
 		this.size = size;
 	}
 	
-	// Añadir simple como el del ArrayList que lo añadia en la ultima posicion
+	/**
+	 * Pre: ---
+	 * Post: Este metodo añade un nodo al final de la lista, como la clase
+	 * ArrayList.
+	 * @param node
+	 * @return
+	 */
 	public boolean add (NodeClub node) {
 		try {		
 			// Asi se añade el primer nodo
@@ -61,6 +68,14 @@ public class SimpleLinkedListClub {
 		}
 	}
 	
+	/**
+	 * Pre: ---
+	 * Post: Este metodo borra un NodeSocio de la posicion pasada
+	 * por parametro. Contempla la posibilidad de que este al principio,
+	 * en medio o al final.
+	 * @param position
+	 * @return
+	 */
 	public boolean delete (int position) {
 		try {
 			// Si se quiere borrar el primer nodo
@@ -88,9 +103,14 @@ public class SimpleLinkedListClub {
 		}
 	}
 	
-	// Metodo get, como el ArrayList que le pides el get(i), el puntero se mueve hasta ese nodo
-	// y en ese momento devuelve p, si no esta en la lista porque es mas peque�a o esta vacia
-	// el return es null
+	/**
+	 * Pre: ---
+	 * Post: Este metodo sirve para coger un NodeSocio situado en una
+	 * posicion concreta de la Lista Simple Enlazada, como el metodo
+	 * get de la clase ArrayList.
+	 * @param position
+	 * @return
+	 */
 	public NodeClub get (int position) {
 		try {
 			// Comprobamos que la posicion sea correcta
@@ -105,10 +125,16 @@ public class SimpleLinkedListClub {
 		} return null;		
 	}
 	
+	
+	/**
+	 * Pre: ---
+	 * Post: Este metodo muestra por pantalla el contenido de una lista
+	 * simple enlazada.
+	 */
 	public void show() {
 		NodeClub p = first;
 		for (int i = 0; i < size; i++) {
-			System.out.println("[" + i + "] -> " + p.getContent());
+			System.out.println("[" + i + "] -> " + p.getContent().getNombre());
 			p = p.getNext();
 		}
 	}

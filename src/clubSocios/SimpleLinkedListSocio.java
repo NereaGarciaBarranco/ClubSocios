@@ -4,6 +4,7 @@ public class SimpleLinkedListSocio {
 	private NodeSocio first;
 	private int size;
 	
+	// METODOS CONSTRUCTORES
 	// Cuando la lista esta vacia
 	public SimpleLinkedListSocio() {
 		this.first = null;
@@ -33,34 +34,81 @@ public class SimpleLinkedListSocio {
 		this.size = size;
 	}
 	
-	// Añadir simple como el del ArrayList que lo añadia en la ultima posicion
+	/**
+	 * Pre: Este metodo recibe un objeto de tipo NodeSocio que contiene un
+	 * objeto de tipo Socio y otro NodeSocio vacio que servira para enlazarlo
+	 * en la Lista Simple Enlazada.
+	 * Post: Inserta el [node] recibido por parametro dentro de la Lista
+	 * Simple Enlazada de manera alfabetica. 
+	 * @param node
+	 * @return
+	 */	
 	public boolean add (NodeSocio node) {
 		try {		
 			// Asi se añade el primer nodo
 			if (size == 0) {
-				// First apunta al nodo que le estas dando, eso es a�adir el primer elemento
 				first = node;
-			} else {
-				// Creamos un puntero que apunta exactamente a donde apunta first
-				// Lo vamos a ir desplazando hasta que llegue al ultimo punto de la lista enlazada
-				// First no lo podemos mover, por eso creamos un puntero
+			} 
+			// Si solo hay un nodo
+			else if (size == 1) {
 				NodeSocio p = first;
-				// Con este bucle el puntero se mueve al final y apunta al ultimo nodo
-				for (int i = 1; i < size; i++) {
+				// Si node va despues que p
+				if (p.getContent().getNombre().compareTo(node.getContent().getNombre()) < 0) {
+					p.setNext(node);
+				}
+				// Si p va despues que node
+				else {
+					node.setNext(p);
+					first = node;
+				}
+			}
+			// En el resto de casos buscamos la posicion en la que se inserta
+			else {			
+				// Cogemos el primero
+				NodeSocio p = first;
+				// Si p va despues de node lo ponemos antes y lo convertimos en first
+				if (p.getContent().getNombre().compareTo(node.getContent().getNombre()) > 0) {
+					node.setNext(p);
+					first = node;
+					size++; 
+					return true;
+				}				
+				NodeSocio previo = p;
+				while (true) {
+					// Pasamos al siguiente
 					p = p.getNext();
-				} 
-				// Cuando apunta al final se a�ade el nodo que le acabas de pasar por parametro
-				p.setNext(node);
-				// Sumamos 1 al tama�o porque lo hemos añadido
-				
-			} size++;
-			return true;
+					// Si p va despues de node
+					if (p.getContent().getNombre().compareTo(node.getContent().getNombre()) > 0) {
+						node.setNext(p);
+						previo.setNext(node);
+						size++; 
+						return true;
+					} else {
+						previo = p;
+					}
+					if (p == null || p.getNext() == null) {
+						break;
+					}					
+				}		
+				previo.setNext(node);
+				size++; 
+				return true;
+				// Sumamos 1 al tamaño porque lo hemos añadido			
+			} size++; return true;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			return false;
 		}
 	}
-	
+	 
+	/**
+	 * Pre: ---
+	 * Post: Este metodo borra un NodeSocio de la posicion pasada
+	 * por parametro. Contempla la posibilidad de que este al principio,
+	 * en medio o al final.
+	 * @param position
+	 * @return
+	 */
 	public boolean delete (int position) {
 		try {
 			// Si se quiere borrar el primer nodo
@@ -88,9 +136,14 @@ public class SimpleLinkedListSocio {
 		}
 	}
 	
-	// Metodo get, como el ArrayList que le pides el get(i), el puntero se mueve hasta ese nodo
-	// y en ese momento devuelve p, si no esta en la lista porque es mas peque�a o esta vacia
-	// el return es null
+	/**
+	 * Pre: ---
+	 * Post: Este metodo sirve para coger un NodeSocio situado en una
+	 * posicion concreta de la Lista Simple Enlazada, como el metodo
+	 * get de la clase ArrayList.
+	 * @param position
+	 * @return
+	 */
 	public NodeSocio get (int position) {
 		try {
 			// Comprobamos que la posicion sea correcta
@@ -105,10 +158,15 @@ public class SimpleLinkedListSocio {
 		} return null;		
 	}
 	
+	/**
+	 * Pre: ---
+	 * Post: Este metodo muestra por pantalla el contenido de una lista
+	 * simple enlazada.
+	 */
 	public void show() {
 		NodeSocio p = first;
 		for (int i = 0; i < size; i++) {
-			System.out.println("[" + i + "] -> " + p.getContent());
+			System.out.println("[" + i + "] -> " + p.getContent().getNombre());
 			p = p.getNext();
 		}
 	}

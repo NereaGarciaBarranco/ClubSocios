@@ -3,7 +3,8 @@ package clubSocios;
 public class NodeSocio {
 	private Socio content;
 	private NodeSocio next;
-
+	
+	// METODO CONSTRUCTOR
 	public NodeSocio (Socio content, NodeSocio next) {
 		this.content = content;
 		this.next = next;
@@ -13,6 +14,7 @@ public class NodeSocio {
 		return content;
 	}
 	
+	// METODOS GET Y SET
 	public void setContent(Socio content) {
 		this.content = content;
 	}
@@ -29,14 +31,5 @@ public class NodeSocio {
 	public String toString() {
 		return "Content = " + content + "\n";
 	}
-	
-	public int compareTo(NodeSocio n) {
-		if (this.content.getNombre().compareTo(n.content.getNombre()) >= 1) {
-			return 1;
-		} else if (this.content.getNombre().compareTo(n.content.getNombre()) <= 1) {
-			return -1;
-		} else {
-			return 0;
-		}		
-	}
+
 }

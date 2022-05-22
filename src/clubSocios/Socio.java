@@ -6,19 +6,15 @@ public class Socio {
 	private String apellido2;
 	private String fechaIncorporacion;
 	
-	/**
-	 * @param nombre
-	 * @param apellido1
-	 * @param apellido2
-	 * @param fechaIncorporacion
-	 */
+	// METODO CONSTRUCTOR
 	public Socio(String nombre, String apellido1, String apellido2, String fechaIncorporacion) {
 		this.nombre = nombre;
 		this.apellido1 = apellido1;
 		this.apellido2 = apellido2;
 		this.fechaIncorporacion = fechaIncorporacion;
 	}
-
+	
+	// METODOS GET Y SET DE LA CLASE
 	public String getNombre() {
 		return nombre;
 	}
@@ -53,7 +49,7 @@ public class Socio {
 
 	@Override
 	public String toString() {
-		return "Socio [nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2
-				+ ", fechaIncorporacion=" + fechaIncorporacion + "]";
+		return "Nombre = " + nombre + ", Apellido 1 = " + apellido1 + ", Apellido2 = " + apellido2
+				+ ", Fecha Incorporacion = " + fechaIncorporacion + " ";
 	}
 }
