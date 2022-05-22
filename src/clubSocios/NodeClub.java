@@ -34,7 +34,7 @@ public class NodeClub {
 
 	@Override
 	public String toString() {
-		return "Content = " + content + "\n";
+		return content.getNombre();
 	}
 	
 	public int compareTo(NodeClub n) {

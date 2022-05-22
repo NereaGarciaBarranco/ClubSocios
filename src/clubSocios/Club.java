@@ -37,6 +37,6 @@ public class Club {
 
 	@Override
 	public String toString() {
-		return "Club [nombre=" + nombre + "]";
+		return  nombre;
 	}
 }

@@ -36,7 +36,7 @@ public class SimpleLinkedListSocio {
 	// Añadir simple como el del ArrayList que lo añadia en la ultima posicion
 	public boolean add (NodeSocio node) {
 		try {		
-			// Asi se a�ade el primer nodo
+			// Asi se añade el primer nodo
 			if (size == 0) {
 				// First apunta al nodo que le estas dando, eso es a�adir el primer elemento
 				first = node;
@@ -51,7 +51,7 @@ public class SimpleLinkedListSocio {
 				} 
 				// Cuando apunta al final se a�ade el nodo que le acabas de pasar por parametro
 				p.setNext(node);
-				// Sumamos 1 al tama�o porque lo hemos a�adido
+				// Sumamos 1 al tama�o porque lo hemos añadido
 				
 			} size++;
 			return true;
